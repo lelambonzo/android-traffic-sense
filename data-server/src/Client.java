@@ -62,6 +62,7 @@ public class Client extends Thread
 	    if (this.msg.contains("CMD_QUIT"))
 		try
 		{
+		    this.out.close();
 		    this.s.close();
 		} catch (IOException e)
 		{
