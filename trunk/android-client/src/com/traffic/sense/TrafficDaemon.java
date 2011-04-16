@@ -6,9 +6,14 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The main traffic sensing Android app
@@ -29,16 +34,23 @@ public class TrafficDaemon extends Activity
     {
 	super.onCreate(savedInstanceState);
 	setManualLocation();
-	/*
-	 * LocationManager lm = (LocationManager)
-	 * getSystemService(LOCATION_SERVICE); LocationListener ll = new
-	 * MyLocationListener();
-	 * lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ll);
-	 */
+	setContentView(tv);
+
+	/* Use the LocationManager class to obtain GPS locations */
+
+	//LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+	//LocationListener mlocListener = new MyLocationListener();
+
+	//mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
+	//	mlocListener);
+
 	try
 	{
 	    connect("10.0.2.2", 27960);
-	    send("Hello world");
+	    send("CMD_HELLO");
+	    send(tv.getText().toString());
+	    send("CMD_QUIT");
 	} catch (UnknownHostException e)
 	{
 	    // TODO Auto-generated catch block
@@ -48,7 +60,6 @@ public class TrafficDaemon extends Activity
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
-	setContentView(tv);
     }
 
     /**
@@ -103,35 +114,78 @@ public class TrafficDaemon extends Activity
 	    {
 		out.close();
 		s.close();
-		System.out.println("Client Disconnected.");
+		Log.i("ServerConnection","Client Disconnected.");
 	    }
 	}
     }
+
+    class MyLocationListener implements LocationListener
+
+    {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.location.LocationListener#onLocationChanged(android.location
+	 * .Location)
+	 */
+	@Override
+	public void onLocationChanged(Location loc)
+	{
+	    // TODO Auto-generated method stub
+	    loc.getLatitude();
+	    loc.getLongitude();
+	    String Text = "My current location is: " + "Latitud = "
+		    + loc.getLatitude() + "Longitud = " + loc.getLongitude();
+	    
+	    Log.i("GeoLocation", Text);
+
+	    //Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT)
+		//    .show();
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.location.LocationListener#onProviderDisabled(java.lang.String
+	 * )
+	 */
+	@Override
+	public void onProviderDisabled(String provider)
+	{
+	    // TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.location.LocationListener#onProviderEnabled(java.lang.String)
+	 */
+	@Override
+	public void onProviderEnabled(String provider)
+	{
+	    // TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * android.location.LocationListener#onStatusChanged(java.lang.String,
+	 * int, android.os.Bundle)
+	 */
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras)
+	{
+	    // TODO Auto-generated method stub
+
+	}
+
+    }/* End of Class MyLocationListener */
 }
-/*
- * class MyLocationListener implements LocationListener {
- * 
- * @Override public void onLocationChanged(Location location) { if (location !=
- * null) { TrafficDaemon.tv.setText("Altitude: " + location.getAltitude() +
- * "\nLatitude: " + location.getLatitude() + "\nLongitude: " +
- * location.getLongitude() + "\nSpeed: " + location.getSpeed()); }
- * 
- * }
- * 
- * @Override public void onProviderDisabled(String provider) { // TODO
- * Auto-generated method stub
- * 
- * }
- * 
- * @Override public void onProviderEnabled(String provider) { // TODO
- * Auto-generated method stub
- * 
- * }
- * 
- * @Override public void onStatusChanged(String provider, int status, Bundle
- * extras) { // TODO Auto-generated method stub
- * 
- * }
- * 
- * }
- */
