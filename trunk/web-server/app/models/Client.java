@@ -8,18 +8,17 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import play.db.jpa.Model;
+import play.db.jpa.GenericModel;
 
 /**
  * @author Amr Tj. Wallas
  * 
  */
 @Entity
-public class Client extends Model
+public class Client extends GenericModel
 {
     @Id
     public int cell_id;
