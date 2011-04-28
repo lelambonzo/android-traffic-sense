@@ -113,12 +113,15 @@ public class TrafficDaemon extends Activity
 		    + loc.getLongitude();
 	    Log.i("GeoLocation", "My current location is:\n " + txt);
 	    tv.setText("My current location is:\n" + txt);
-	    txt = tm.getDeviceId() + "\n" + txt; /* DeviceID is null in emulator */
+	    String msg = loc.getLongitude() + "\n" + loc.getLatitude() + "\n"
+		    + loc.getAltitude() + "\n" + loc.getBearing() + "\n"
+		    + loc.getAccuracy() + "\n" + loc.getSpeed();
+	    msg = tm.getDeviceId() + "\n" + msg; /* DeviceID is null in emulator */
 	    try
 	    {
 		connect("10.0.2.2", 27960);
 		send("CMD_HELLO");
-		send(txt);
+		send(msg);
 		send("CMD_QUIT");
 	    } catch (UnknownHostException e)
 	    {
