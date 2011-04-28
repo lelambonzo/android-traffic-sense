@@ -13,7 +13,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * The main traffic sensing Android app
@@ -33,51 +32,18 @@ public class TrafficDaemon extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
 	super.onCreate(savedInstanceState);
-	setManualLocation();
+	tv = new TextView(getApplicationContext());
+	tv.setText("I currently have no Location Data.");
 	setContentView(tv);
 
 	/* Use the LocationManager class to obtain GPS locations */
 
-	//LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+	LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-	//LocationListener mlocListener = new MyLocationListener();
+	LocationListener mlocListener = new MyLocationListener();
 
-	//mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
-	//	mlocListener);
-
-	try
-	{
-	    connect("10.0.2.2", 27960);
-	    send("CMD_HELLO");
-	    send(tv.getText().toString());
-	    send("CMD_QUIT");
-	} catch (UnknownHostException e)
-	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (IOException e)
-	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-    }
-
-    /**
-     * Sets GPS location manually for testing purposes.
-     */
-    public void setManualLocation()
-    {
-	tv = new TextView(this);
-
-	Location l = new Location("manual_fix");
-	l.setAltitude(12345.6);
-	l.setLatitude(5432.1);
-	l.setLongitude(6023.4);
-	l.setSpeed(60.8f);
-	tv.setText("Altitude: " + l.getAltitude() + "\nLatitude: "
-		+ l.getLatitude() + "\nLongitude: " + l.getLongitude()
-		+ "\nSpeed: " + l.getSpeed());
-
+	mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
+		mlocListener);
     }
 
     /**
@@ -114,44 +80,59 @@ public class TrafficDaemon extends Activity
 	    {
 		out.close();
 		s.close();
-		Log.i("ServerConnection","Client Disconnected.");
+		Log.i("ServerConnection", "Client Disconnected.");
 	    }
 	}
     }
 
+    /**
+     * Location Listener class that will perform actions according to location
+     * updates.
+     * 
+     * @author Amr Tj. Wallas
+     * 
+     */
     class MyLocationListener implements LocationListener
 
     {
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * First called when the GPS location is changed. (New location fix
+	 * obtained)
 	 * 
-	 * @see
-	 * android.location.LocationListener#onLocationChanged(android.location
-	 * .Location)
+	 * @param loc
+	 *            The new Obtained location fix.
 	 */
 	@Override
 	public void onLocationChanged(Location loc)
 	{
-	    // TODO Auto-generated method stub
-	    loc.getLatitude();
-	    loc.getLongitude();
-	    String Text = "My current location is: " + "Latitud = "
-		    + loc.getLatitude() + "Longitud = " + loc.getLongitude();
-	    
-	    Log.i("GeoLocation", Text);
-
-	    //Toast.makeText(getApplicationContext(), Text, Toast.LENGTH_SHORT)
-		//    .show();
-
+	    String txt = "My current location is:\n " + "Latitude: "
+		    + loc.getLatitude() + "\n Longtitude: "
+		    + loc.getLongitude();
+	    Log.i("GeoLocation", txt);
+	    tv.setText(txt);
+	    try
+	    {
+		connect("10.0.2.2", 27960);
+		send("CMD_HELLO");
+		send(txt);
+		send("CMD_QUIT");
+	    } catch (UnknownHostException e)
+	    {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } catch (IOException e)
+	    {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Called when the GPS provider is disabled or connection to it lost
 	 * 
-	 * @see
-	 * android.location.LocationListener#onProviderDisabled(java.lang.String
-	 * )
+	 * @param provider
+	 *            The GPS provider
 	 */
 	@Override
 	public void onProviderDisabled(String provider)
@@ -160,11 +141,12 @@ public class TrafficDaemon extends Activity
 
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Called when the GPS provider is enabled or connection to it is
+	 * established.
 	 * 
-	 * @see
-	 * android.location.LocationListener#onProviderEnabled(java.lang.String)
+	 * @param provider
+	 *            The GPS provider
 	 */
 	@Override
 	public void onProviderEnabled(String provider)
@@ -173,12 +155,8 @@ public class TrafficDaemon extends Activity
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.location.LocationListener#onStatusChanged(java.lang.String,
-	 * int, android.os.Bundle)
+	/**
+	 * Called when the GPS status is changed.
 	 */
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras)
@@ -188,4 +166,4 @@ public class TrafficDaemon extends Activity
 	}
 
     }/* End of Class MyLocationListener */
-}
+}/* End of Activity Class */
