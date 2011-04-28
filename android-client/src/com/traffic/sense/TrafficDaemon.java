@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class TrafficDaemon extends Activity
     public static TextView tv;
     public static Socket s;
     public static PrintWriter out;
+    public static TelephonyManager tm;
 
     /**
      * Called when the activity is first created.
@@ -33,6 +35,7 @@ public class TrafficDaemon extends Activity
     {
 	super.onCreate(savedInstanceState);
 	tv = new TextView(getApplicationContext());
+	tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 	tv.setText("I currently have no Location Data.");
 	setContentView(tv);
 
@@ -106,11 +109,11 @@ public class TrafficDaemon extends Activity
 	@Override
 	public void onLocationChanged(Location loc)
 	{
-	    String txt = "My current location is:\n " + "Latitude: "
-		    + loc.getLatitude() + "\n Longtitude: "
+	    String txt = "Latitude:" + loc.getLatitude() + "\nLongtitude:"
 		    + loc.getLongitude();
-	    Log.i("GeoLocation", txt);
-	    tv.setText(txt);
+	    Log.i("GeoLocation", "My current location is:\n " + txt);
+	    tv.setText("My current location is:\n" + txt);
+	    txt = tm.getDeviceId() + "\n" + txt; /* DeviceID is null in emulator */
 	    try
 	    {
 		connect("10.0.2.2", 27960);
