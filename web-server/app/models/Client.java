@@ -21,13 +21,13 @@ import play.db.jpa.GenericModel;
 public class Client extends GenericModel
 {
     @Id
-    public int cell_id;
+    public int device_id;
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     public List<Update> updates;
 
     public Client(int cellId)
     {
-	this.cell_id = cellId;
+	this.device_id = cellId;
 	this.updates = new ArrayList<Update>();
     }
 }
