@@ -28,7 +28,8 @@ public class Update extends Model
     public Date date;
 
     public Update(Client client, double longitude, double latitude,
-	    double altitude, float bearing, float accuracy, float speed)
+	    double altitude, float bearing, float accuracy, float speed,
+	    long date)
     {
 	this.client = client;
 	this.longitude = longitude;
@@ -37,6 +38,6 @@ public class Update extends Model
 	this.bearing = bearing;
 	this.accuracy = accuracy;
 	this.speed = speed;
-	this.date = new Date();
+	this.date = new Date(date);
     }
 }
