@@ -115,7 +115,8 @@ public class TrafficDaemon extends Activity
 	    tv.setText("My current location is:\n" + txt);
 	    String msg = loc.getLongitude() + "\n" + loc.getLatitude() + "\n"
 		    + loc.getAltitude() + "\n" + loc.getBearing() + "\n"
-		    + loc.getAccuracy() + "\n" + loc.getSpeed();
+		    + loc.getAccuracy() + "\n" + loc.getSpeed() + "\n"
+		    + loc.getTime();
 	    msg = tm.getDeviceId() + "\n" + msg; /* DeviceID is null in emulator */
 	    try
 	    {
