@@ -55,7 +55,7 @@ public class Server
 class ClientThread extends Thread
 {
     public Socket clientSock;
-    long device_id;
+    long device_id, date;
     double longitude, latitude, altitude;
     float bearing, accuracy, speed;
 
@@ -127,7 +127,7 @@ class ClientThread extends Thread
 	{
 	    clientSock.close();
 	    sendHTTP(device_id, longitude, latitude, altitude, bearing,
-		    accuracy, speed);
+		    accuracy, speed, date);
 	} else
 	{
 	    System.out.println(msg); /* For Testing purposes */
@@ -162,6 +162,10 @@ class ClientThread extends Thread
 		    speed = Float.parseFloat(msg);
 		    break;
 
+		case 9:
+		    date = Long.parseLong(msg);
+		    break;
+
 	    }
 	}
     }
@@ -176,14 +180,16 @@ class ClientThread extends Thread
      * @param bearing
      * @param accuracy
      * @param speed
+     * @param date
      */
     public void sendHTTP(long device_id, double longitude, double latitude,
-	    double altitude, float bearing, float accuracy, float speed)
+	    double altitude, float bearing, float accuracy, float speed,
+	    long date)
     {
 	String data = "device_id=" + device_id + "&longitude=" + longitude
 		+ "&latitude=" + latitude + "&altitude=" + altitude
 		+ "&bearing=" + bearing + "&accuracy=" + accuracy + "&speed="
-		+ speed;
+		+ speed + "&date=" + date;
 
 	try
 	{
