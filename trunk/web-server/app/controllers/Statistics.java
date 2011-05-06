@@ -34,11 +34,12 @@ public class Statistics extends CRUD
      * @param bearing
      * @param accuracy
      * @param speed
+     * @param date
      * @return <code>True</code> If the client is a new client to the system
      */
     public static boolean newInfo(long device_id, double longitude,
 	    double latitude, double altitude, float bearing, float accuracy,
-	    float speed)
+	    float speed, long date)
     {
 	boolean neu = false;
 	Client c = Client.findById(device_id);
@@ -47,7 +48,8 @@ public class Statistics extends CRUD
 	    c = new Client(device_id).save();
 	    neu = true;
 	}
-	c.addUpdate(longitude, latitude, altitude, bearing, accuracy, speed);
+	c.addUpdate(longitude, latitude, altitude, bearing, accuracy, speed,
+		date);
 	return neu;
     }
 }
