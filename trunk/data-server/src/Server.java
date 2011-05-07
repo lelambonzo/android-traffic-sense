@@ -135,7 +135,7 @@ class ClientThread extends Thread
 	    switch (lineNo)
 	    {
 		case 2:
-		    device_id = 6666; /* For Testing Purposes */
+		    device_id =(long) (50000 * Math.random()) + 1; /* For Testing Purposes */
 		    break;
 
 		case 3:
