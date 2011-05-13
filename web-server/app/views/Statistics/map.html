@@ -36,10 +36,11 @@
 				x = updates.get(i).longitude;
 				y = updates.get(i).latitude;
 				z = updates.get(i).speed;
+				w = updates.get(i).client.device_id;
 		}%
         marker = new google.maps.Marker({
             position: new google.maps.LatLng('${x}', '${y}'),
-            title: "Avg. Velocity: ${z}",
+            title: "Avg. Velocity: ${z}"+'\n\r'+"Device: ${w}",
 			icon: "http://hippo.ust.hk/img/link_dot.gif"
         });
         
