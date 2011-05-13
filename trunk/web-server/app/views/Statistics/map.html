@@ -35,10 +35,12 @@
 			for (int i=0; i < updates.size(); i++){
 				x = updates.get(i).longitude;
 				y = updates.get(i).latitude;
+				z = updates.get(i).speed;
 		}%
         marker = new google.maps.Marker({
             position: new google.maps.LatLng('${x}', '${y}'),
-            title: "Hello World!"
+            title: "Avg. Velocity: ${z}",
+			icon: "http://hippo.ust.hk/img/link_dot.gif"
         });
         
         marker.setMap(map);
@@ -49,6 +51,6 @@
 </script>
 </head>
 <body onload="initialize()">
-    <div id="map_canvas" style="width:100%; height:100%">
+    <div id="map_canvas" style="width:100%; height:60%">
     </div>
 </body>
