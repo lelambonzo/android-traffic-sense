@@ -38,7 +38,15 @@ public class Statistics extends CRUD
      */
     public static void map()
     {
-	List<Update> updates = Update.findAll();
+	long currDate = new Date().getTime();
+	List<Update> updates = Update.find("date >= ? AND date <= ?", new Date(currDate-1000), new Date(currDate+1000)).fetch();
+	if(updates.isEmpty())
+	{
+	    Update u = Update.find("date <= ? ORDER BY date DESC", new Date(currDate)).first();
+	    updates = Update.find("date >= ?", new Date(u.date.getTime() - 60000)).fetch();
+	    long timeDiff = currDate-u.date.getTime()-60000;
+	    render(updates,timeDiff);
+	}
 	render(updates);
     }
 
