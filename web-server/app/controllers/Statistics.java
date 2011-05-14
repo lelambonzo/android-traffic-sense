@@ -3,10 +3,12 @@
  */
 package controllers;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import models.Client;
+import models.MyUpdate;
 import models.Update;
 
 /**
@@ -38,16 +40,57 @@ public class Statistics extends CRUD
      */
     public static void map()
     {
+	//TODO Filter by device ID
 	long currDate = new Date().getTime();
-	List<Update> updates = Update.find("date >= ? AND date <= ?", new Date(currDate-1000), new Date(currDate+1000)).fetch();
-	if(updates.isEmpty())
+	List<Client> clients = Client.find("lastUpdate >= ? AND lastUpdate <= ?", new Date(currDate-1000), new Date(currDate)).fetch();
+	if(clients.isEmpty())
 	{
-	    Update u = Update.find("date <= ? ORDER BY date DESC", new Date(currDate)).first();
-	    updates = Update.find("date >= ?", new Date(u.date.getTime() - 60000)).fetch();
-	    long timeDiff = currDate-u.date.getTime()-60000;
+	   Date date = Update.find("SELECT MAX(date) FROM Update").first();
+	   clients = Client.find("lastUpdate >= ?", new Date(date.getTime()-60000)).fetch();
+	   //System.out.println(clients.size());
+	    long timeDiff = currDate-date.getTime()-60000;
+	    List<Update> updates = new ArrayList<Update>();
+	    for (Client c : clients)
+	    {
+		updates.add(c.updates.get(c.updates.size()-1));
+	    }
 	    render(updates,timeDiff);
 	}
+	List<Update> updates = new ArrayList<Update>();
+	for (Client c : clients)
+	{
+	    updates.add(c.updates.get(c.updates.size()-1));
+	}
 	render(updates);
+    }
+    
+    public static void pollUpdates()
+    {
+	long currDate = new Date().getTime();
+	List<Client> clients = Client.find("lastUpdate >= ? AND lastUpdate <= ? ORDER BY lastUpdate ASC", new Date(currDate-1000), new Date(currDate)).fetch();
+	Update currUp;
+	if(clients.isEmpty())
+	{
+	   Date date = Update.find("SELECT MAX(date) FROM Update").first();
+	   clients = Client.find("lastUpdate >= ? ORDER BY lastUpdate ASC", new Date(date.getTime()-60000)).fetch();
+	   //System.out.println(clients.size());
+	    List<MyUpdate> updates = new ArrayList<MyUpdate>();
+	    for (Client c : clients)
+	    {
+		currUp = c.updates.get(c.updates.size()-1);
+		updates.add(new MyUpdate(currUp.client.device_id, currUp.speed, currUp.longitude, currUp.latitude,currUp.date));
+	    }
+	    renderJSON(updates);
+	}
+	List<MyUpdate> updates = new ArrayList<MyUpdate>();
+	for (Client c : clients)
+	{
+	    currUp = c.updates.get(c.updates.size()-1);
+	    updates.add(new MyUpdate(currUp.client.device_id, currUp.speed, currUp.longitude, currUp.latitude,currUp.date));
+	}
+	renderJSON(updates);
+	//List<Update> updates = Update.find("SELECT client.device_id, speed, longitude, latitude FROM Update").fetch();
+	//renderJSON(updates);
     }
 
     /**
