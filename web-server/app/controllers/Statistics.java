@@ -42,11 +42,11 @@ public class Statistics extends CRUD
     {
 	//TODO Filter by device ID
 	long currDate = new Date().getTime();
-	List<Client> clients = Client.find("lastUpdate >= ? AND lastUpdate <= ?", new Date(currDate-1000), new Date(currDate)).fetch();
+	List<Client> clients = Client.find("lastUpdate >= ? AND lastUpdate <= ? ORDER BY lastUpdate ASC", new Date(currDate-1000), new Date(currDate)).fetch();
 	if(clients.isEmpty())
 	{
 	   Date date = Update.find("SELECT MAX(date) FROM Update").first();
-	   clients = Client.find("lastUpdate >= ?", new Date(date.getTime()-60000)).fetch();
+	   clients = Client.find("lastUpdate >= ? ORDER BY lastUpdate ASC", new Date(date.getTime()-60000)).fetch();
 	   //System.out.println(clients.size());
 	    long timeDiff = currDate-date.getTime()-60000;
 	    List<Update> updates = new ArrayList<Update>();
