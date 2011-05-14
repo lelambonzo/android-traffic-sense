@@ -14,22 +14,75 @@
     #map_canvas {
         height: 100%
     }
+	
+	.error {
+    background: #c00 !important;
+	}
+
+	.success {
+    background: #008800 !important;
+	}
 </style>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false">
 </script>
 <script type="text/javascript">
+	var markers = new Array();
+	var map;
+	var lastUpd;
+	function clearMarkers()
+	{
+		for (i in markers)
+		{
+			markers[i].setMap(null);
+		}
+		markers.splice(0,markers.length);		
+	}
+	
+	function poll_updates()
+	{
+		$.ajax({
+			url: "@{pollUpdates()}",
+			async: false,
+			success: function(data){
+				$.each(data, function (key,val){
+					//alert(val.device_id);
+					lastUpd = val;
+					create_marker(val);
+				});
+				var currDate = new Date().getTime();
+				var timeDi = (currDate - lastUpd.date) / 60000;
+				
+				$('#info').html('<div class="success"></div>Showing data based on '+
+				data.length+ ' updates from the past '+ timeDi + ' minutes');
+				
+				//alert(currDate-lastUpd.date);
+			}
+		});
+		//alert(updates.length);
+	}
+	
+	function create_marker(data)
+	{
+		marker = new google.maps.Marker({
+            position: new google.maps.LatLng(data.longitude, data.latitude),
+            title: "Avg. Velocity: "+data.speed+'\n\r'+"Device: "+data.device_id,
+			icon: "http://hippo.ust.hk/img/link_dot.gif"
+        });
+		
+        markers.push(marker);
+        marker.setMap(map);
+	}
+	
     function initialize(){
-        //var x = '${updates.get(0).longitude}';
-        //var y = '${updates.get(0).latitude}';
-        //alert(x);
-        //alert(y);
-        var latlng = new google.maps.LatLng(0, 0);
+        var latlng = new google.maps.LatLng(30.102308, 31.239953);
+		
         var myOptions = {
-            zoom: 1,
+            zoom: 12,
             center: latlng,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
-        var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+		
+        map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
         var marker;
 		%{
 			for (int i=0; i < updates.size(); i++){
@@ -38,28 +91,56 @@
 				z = updates.get(i).speed;
 				w = updates.get(i).client.device_id;
 		}%
+       
         marker = new google.maps.Marker({
             position: new google.maps.LatLng('${x}', '${y}'),
             title: "Avg. Velocity: ${z}"+'\n\r'+"Device: ${w}",
 			icon: "http://hippo.ust.hk/img/link_dot.gif"
         });
-        
+		
+        markers.push(marker);
         marker.setMap(map);
-		%{
+                
+       	%{
 			}
 		}%
+		
     }
+	var timer_enable = 0;
+	
+	function do_poll()
+	{
+		if (timer_enable) {
+			clearMarkers();
+			poll_updates();
+			setTimeout("do_poll()", 1000);
+		}
+	}
+	
+	function start_polling()
+	{
+		timer_enable = 1;
+		do_poll();
+	}
+	
 </script>
 </head>
-<body onload="initialize()">
+<body onload="initialize(); start_polling();">
 	<div id="map_canvas" style="width:100%; height:60%">
     </div>
 	<div id="bla" style="height:40%">
+		<center>
+		<div id="info">
+			<div class="success"></div>
 		#{if timeDiff}
-		Showing data from the past ${timeDiff/(1000 * 60)} minutes
+		Showing data based on ${updates.size()} updates from the past ${timeDiff/60000} minutes.
 		#{/if}
 		#{else}
-		<font color="red">This is Real Time data</font>
+		Showing data based on ${updates.size()} updates from the past 1 Second.
 		#{/else}
+		</div>		
+		<input type="button" id="resume" value="Resume RealTime" onclick="start_polling(); $('#pause').attr('disabled',false); this.disabled=true; $('.success').html('Real Time Updates Resumed!').fadeIn('fast').fadeOut(5000);" disabled=true/>
+		<input type="button" id="pause" value="Pause RealTime" onclick="timer_enable = 0; $('#resume').attr('disabled',false); this.disabled=true; $('.success').html('Real Time Updates Paused!').fadeIn('fast').fadeOut(5000);" />
+		</center>
 	</div>
 </body>
