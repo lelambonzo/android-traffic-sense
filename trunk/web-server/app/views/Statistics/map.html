@@ -29,6 +29,7 @@
 	var markers = new Array();
 	var map;
 	var lastUpd;
+	var dirServ = new google.maps.DirectionsService();
 	function clearMarkers()
 	{
 		for (i in markers)
@@ -63,14 +64,41 @@
 	
 	function create_marker(data)
 	{
-		marker = new google.maps.Marker({
-            position: new google.maps.LatLng(data.longitude, data.latitude),
-            title: "Avg. Velocity: "+data.speed+'\n\r'+"Device: "+data.device_id,
-			icon: "http://hippo.ust.hk/img/link_dot.gif"
-        });
-		
+		var approximated = approx_to_nearest_road(data.latitude, data.longitude);
+		if (approximated.length == 0) {
+			marker = new google.maps.Marker({
+				position: new google.maps.LatLng(data.latitude, data.longitude),
+				title: "Avg. Velocity: " + data.speed + '\n\r' + "Device: " + data.device_id,
+				icon: "http://hippo.ust.hk/img/link_dot.gif"
+			});
+		}
+		else{
+			marker = new google.maps.Marker({
+				position: new google.maps.LatLng(approximated[0], approximated[1]),
+				title: "Avg. Velocity: " + data.speed + '\n\r' + "Device: " + data.device_id,
+				icon: "http://hippo.ust.hk/img/link_dot.gif"
+			});
+		}
         markers.push(marker);
         marker.setMap(map);
+	}
+	
+	function approx_to_nearest_road(latt, longt)
+	{
+		var returnArr = new Array();
+		dirServ.route({
+			destination: new google.maps.LatLng(latt,longt), //43.780824,-114.506679
+			origin: new google.maps.LatLng(latt,longt),
+			travelMode: google.maps.TravelMode.DRIVING,
+			unitSystem: google.maps.UnitSystem.METRIC,
+		},function (dirRes, dirStat){
+			if (dirStat == google.maps.DirectionsStatus.OK) {
+				returnArr.push(dirRes.routes[0].legs[0].end_location.lat());
+				returnArr.push(dirRes.routes[0].legs[0].end_location.lng());
+				//alert(dirRes.routes[0].legs[0].end_location.lat());
+			}
+		});
+		return returnArr;
 	}
 	
     function initialize(){
@@ -93,7 +121,7 @@
 		}%
        
         marker = new google.maps.Marker({
-            position: new google.maps.LatLng('${x}', '${y}'),
+            position: new google.maps.LatLng('${y}', '${x}'),
             title: "Avg. Velocity: ${z}"+'\n\r'+"Device: ${w}",
 			icon: "http://hippo.ust.hk/img/link_dot.gif"
         });
@@ -104,6 +132,7 @@
        	%{
 			}
 		}%
+		
 		
     }
 	var timer_enable = 0;
