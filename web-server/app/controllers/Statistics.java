@@ -52,14 +52,16 @@ public class Statistics extends CRUD
 	    List<Update> updates = new ArrayList<Update>();
 	    for (Client c : clients)
 	    {
-		updates.add(c.updates.get(c.updates.size()-1));
+		if(!c.updates.isEmpty())
+		    updates.add(c.updates.get(c.updates.size()-1));
 	    }
 	    render(updates,timeDiff);
 	}
 	List<Update> updates = new ArrayList<Update>();
 	for (Client c : clients)
 	{
-	    updates.add(c.updates.get(c.updates.size()-1));
+	    if(!c.updates.isEmpty())
+		updates.add(c.updates.get(c.updates.size()-1));
 	}
 	render(updates);
     }
@@ -77,16 +79,22 @@ public class Statistics extends CRUD
 	    List<MyUpdate> updates = new ArrayList<MyUpdate>();
 	    for (Client c : clients)
 	    {
-		currUp = c.updates.get(c.updates.size()-1);
-		updates.add(new MyUpdate(currUp.client.device_id, currUp.speed, currUp.longitude, currUp.latitude,currUp.date));
+		if(!c.updates.isEmpty())
+		{
+		    currUp = c.updates.get(c.updates.size()-1);
+		    updates.add(new MyUpdate(currUp.client.device_id, currUp.speed, currUp.longitude, currUp.latitude,currUp.date));
+		}
 	    }
 	    renderJSON(updates);
 	}
 	List<MyUpdate> updates = new ArrayList<MyUpdate>();
 	for (Client c : clients)
 	{
-	    currUp = c.updates.get(c.updates.size()-1);
-	    updates.add(new MyUpdate(currUp.client.device_id, currUp.speed, currUp.longitude, currUp.latitude,currUp.date));
+	    if(!c.updates.isEmpty())
+	    {
+		currUp = c.updates.get(c.updates.size()-1);
+		updates.add(new MyUpdate(currUp.client.device_id, currUp.speed, currUp.longitude, currUp.latitude,currUp.date));
+	    }
 	}
 	renderJSON(updates);
 	//List<Update> updates = Update.find("SELECT client.device_id, speed, longitude, latitude FROM Update").fetch();
