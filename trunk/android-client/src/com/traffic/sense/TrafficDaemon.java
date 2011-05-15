@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 /**
@@ -26,6 +27,7 @@ public class TrafficDaemon extends Activity
     public static Socket s;
     public static PrintWriter out;
     public static TelephonyManager tm;
+    public static WebView webview;
 
     /**
      * Called when the activity is first created.
@@ -34,10 +36,8 @@ public class TrafficDaemon extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
 	super.onCreate(savedInstanceState);
-	tv = new TextView(getApplicationContext());
-	tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-	tv.setText("I currently have no Location Data.");
-	setContentView(tv);
+	tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);	
+	setContentView(R.layout.main);
 
 	/* Use the LocationManager class to obtain GPS locations */
 
@@ -47,6 +47,13 @@ public class TrafficDaemon extends Activity
 
 	mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
 		mlocListener);
+	
+	tv = (TextView) findViewById(R.id.textView1);
+	tv.setText("I currently have no Location Data.");
+	
+	webview = (WebView) findViewById(R.id.webView1);
+	webview.getSettings().setJavaScriptEnabled(true);
+	webview.loadUrl("http://10.0.2.2:9000/statistics/map");
     }
 
     /**
