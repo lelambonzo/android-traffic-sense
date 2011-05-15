@@ -7,6 +7,8 @@
 <TextView  
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:text="@string/hello"
+    android:text="This is some test"
+    android:id="@+id/textView1"
     />
+<WebView android:id="@+id/webView1" android:layout_width="match_parent" android:layout_height="match_parent"></WebView>
 </LinearLayout>
