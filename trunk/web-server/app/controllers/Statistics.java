@@ -100,6 +100,43 @@ public class Statistics extends CRUD
 	//List<Update> updates = Update.find("SELECT client.device_id, speed, longitude, latitude FROM Update").fetch();
 	//renderJSON(updates);
     }
+    
+    public static void pollUpdatesByArea(double lon1, double lat1, double lon2, double lat2)
+    {
+	long currDate = new Date().getTime();
+	List<Client> clients = Client.find("lastUpdate >= ? AND lastUpdate <= ? ORDER BY lastUpdate ASC", new Date(currDate-1000), new Date(currDate)).fetch();
+	Update currUp;
+	if(clients.isEmpty())
+	{
+	   Date date = Update.find("SELECT MAX(date) FROM Update").first();
+	   clients = Client.find("lastUpdate >= ? ORDER BY lastUpdate ASC", new Date(date.getTime()-60000)).fetch();
+	   //System.out.println(clients.size());
+	    List<MyUpdate> updates = new ArrayList<MyUpdate>();
+	    for (Client c : clients)
+	    {
+		if(!c.updates.isEmpty())
+		{
+		    currUp = c.updates.get(c.updates.size()-1);
+		    if(currUp.longitude >= lon1 && currUp.longitude <= lon2 && currUp.latitude >= lat1 && currUp.latitude <= lat2)
+			updates.add(new MyUpdate(currUp.client.device_id, currUp.speed, currUp.longitude, currUp.latitude,currUp.date));
+		}
+	    }
+	    renderJSON(updates);
+	}
+	List<MyUpdate> updates = new ArrayList<MyUpdate>();
+	for (Client c : clients)
+	{
+	    if(!c.updates.isEmpty())
+	    {
+		currUp = c.updates.get(c.updates.size()-1);
+		if(currUp.longitude >= lon1 && currUp.longitude <= lon2 && currUp.latitude >= lat1 && currUp.latitude <= lat2)
+		    updates.add(new MyUpdate(currUp.client.device_id, currUp.speed, currUp.longitude, currUp.latitude,currUp.date));
+	    }
+	}
+	renderJSON(updates);
+	//List<Update> updates = Update.find("SELECT client.device_id, speed, longitude, latitude FROM Update").fetch();
+	//renderJSON(updates);
+    }
 
     /**
      * Adds new Updates into the database given an HTTP post with the params
