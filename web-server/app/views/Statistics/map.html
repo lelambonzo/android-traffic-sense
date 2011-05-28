@@ -33,6 +33,7 @@
 	var trigger_draw = 0;
 	var rect = new google.maps.Rectangle();
 	var popz = new google.maps.InfoWindow();
+	
 	function clearMarkers()
 	{
 		for (i in markers)
@@ -115,6 +116,7 @@
 				icon: "http://hippo.ust.hk/img/link_dot.gif"
 			});
 		}
+		marker.upd = data;
         markers.push(marker);
         marker.setMap(map);
 	}
@@ -220,6 +222,26 @@
 				//alert(rect.getBounds().getNorthEast());
 				//Do some more stuff
 				trigger_draw = 0;
+				if(!timer_enable)
+				{
+					var velocity = 0;
+					var c = 0;
+					var currDate = new Date().getTime();
+					var timeDi = (currDate - lastUpd.date) / 60000;
+					for(i=0; i<markers.length; i++)
+					{
+						if (markers[i].getPosition().lat() >= Math.min(rect.getBounds().getNorthEast().lat(), rect.getBounds().getSouthWest().lat())
+						&& markers[i].getPosition().lat() <= Math.max(rect.getBounds().getNorthEast().lat(), rect.getBounds().getSouthWest().lat())
+						&& markers[i].getPosition().lng() >= Math.min(rect.getBounds().getNorthEast().lng(), rect.getBounds().getSouthWest().lng())
+						&& markers[i].getPosition().lng() <= Math.max(rect.getBounds().getNorthEast().lng(), rect.getBounds().getSouthWest().lng())
+						) {
+							velocity += markers[i].upd.speed;
+							c++;
+						}
+					}
+					$('#info').html('<div class="success"></div>');
+					popz.setContent('Avg. Velocity: '+velocity/c+'<br>#Updates: '+c+'<br>Since '+timeDi+' mins.');
+				}
 			}
 				
 		});
