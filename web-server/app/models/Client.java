@@ -34,7 +34,7 @@ public class Client extends GenericModel
     }
 
     public void addUpdate(double longitude, double latitude, double altitude,
-	    float bearing, float accuracy, float speed, long date)
+	    double bearing, double accuracy, double speed, long date)
     {
 	this.updates.add(new Update(this, longitude, latitude, altitude,
 		bearing, accuracy, speed, date));
