@@ -70,7 +70,31 @@
 		}
 		else
 		{
-			
+			var velocity=0;
+			$.ajax({
+				url: "@{pollUpdatesByArea()}",
+				data: {
+					lon1: Math.min(rect.getBounds().getNorthEast().lng(), rect.getBounds().getSouthWest().lng()),
+					lat1: Math.min(rect.getBounds().getNorthEast().lat(), rect.getBounds().getSouthWest().lat()),
+					lon2: Math.max(rect.getBounds().getNorthEast().lng(), rect.getBounds().getSouthWest().lng()),
+					lat2: Math.max(rect.getBounds().getNorthEast().lat(), rect.getBounds().getSouthWest().lat())
+				},
+				async: false,
+				success: function(data){
+					$.each(data, function(key, val){
+						//alert(val.device_id);
+						lastUpd = val;
+						create_marker(val);
+						velocity += val.speed;
+					});
+					var currDate = new Date().getTime();
+					var timeDi = (currDate - lastUpd.date) / 60000;
+					
+					$('#info').html('<div class="success"></div>');
+					popz.setContent('Avg. Velocity: '+velocity/data.length+'<br>#Updates: '+data.length+'<br>Since '+timeDi+' mins.');
+				//alert(currDate-lastUpd.date);
+				}
+			});
 		}
 	}
 	
@@ -167,6 +191,12 @@
 	function drawArea()
 	{
 		var ll;
+		google.maps.event.addListener(map, 'rightclick', function(event){
+			trigger_draw = 0;
+			popz.close();
+			if(rect)
+				rect.setMap(null);				
+			});
 		google.maps.event.addListener(map, 'click', function(event){
 			trigger_draw++;
 			if (trigger_draw == 1) {
@@ -184,8 +214,8 @@
 				map.panTo(rect.getBounds().getCenter());
 				map.setZoom(map.getZoom()+1);
 				//popz.setContent('Whatever');
-				//popz.setPosition(rect.getBounds().getCenter());
-				//popz.open(map);
+				popz.setPosition(rect.getBounds().getCenter());
+				popz.open(map);
 				//alert(rect.getBounds().getSouthWest());
 				//alert(rect.getBounds().getNorthEast());
 				//Do some more stuff
