@@ -30,6 +30,7 @@
 	var map;
 	var lastUpd;
 	var dirServ = new google.maps.DirectionsService();
+	var polyLines = new Array();
 	var trigger_draw = 0;
 	var rect = new google.maps.Rectangle();
 	var popz = new google.maps.InfoWindow();
@@ -175,11 +176,25 @@
     }
 	var timer_enable = 0;
 	
+	function clearTrafficOverlays()
+	{
+		if(polyLines.length)
+			{
+				for(ii = 0; ii < polyLines.length; ii++)
+				{
+					polyLines[ii].setMap(null);
+				}
+				polyLines.splice(0,polyLines.length);
+				//alert(polyLines.length);
+			}		
+	}
 	function do_poll()
 	{
 		if (timer_enable) {
 			clearMarkers();
+			clearTrafficOverlays();
 			poll_updates();
+			appyTrafficOverlays();
 			setTimeout("do_poll()", 1000);
 		}
 	}
@@ -197,7 +212,8 @@
 			trigger_draw = 0;
 			popz.close();
 			if(rect)
-				rect.setMap(null);				
+				rect.setMap(null);
+				clearTrafficOverlays();
 			});
 		google.maps.event.addListener(map, 'click', function(event){
 			trigger_draw++;
@@ -206,6 +222,7 @@
 				ll = event.latLng;
 				if(rect)
 					rect.setMap(null);
+				clearTrafficOverlays();
 			}
 			else {
 				rect = new google.maps.Rectangle({
@@ -245,6 +262,49 @@
 			}
 				
 		});
+	}
+	
+	function appyTrafficOverlays()
+	{
+		var j = 0;
+		var veloc2,veloc1 = 0;
+		for(i=0; i < markers.length; i++)
+		{
+			//myCluster.push(markers[i].getPosition());
+			veloc1 = markers[i].upd.speed;
+			while(j < markers.length)
+			{
+				var dirRequest = new Object();
+				dirRequest.destination = markers[j].getPosition();
+				dirRequest.origin = markers[i].getPosition();
+				dirRequest.travelMode = google.maps.TravelMode.WALKING;
+				dirRequest.unitSystem = google.maps.UnitSystem.METRIC;
+				veloc2 = markers[j].upd.speed;
+				dirServ.route(dirRequest,function (dirRes, dirStat){
+						if (dirStat == google.maps.DirectionsStatus.OK) {
+							if (dirRes.routes[0].legs[0].distance.value <= 100) {
+								var myLine = new google.maps.Polyline({
+											clickable: false				
+											});
+								var avg_v = (veloc1 + veloc2) / 2;
+								var colr = (avg_v >= 60)? 'green' : (avg_v >= 40)? 'orange' : 'red';
+								var optns = new Object();
+								optns.path = dirRes.routes[0].overview_path;
+								optns.strokeColor = colr;
+								myLine.setOptions(optns);
+								myLine.setMap(map);
+								polyLines.push(myLine);
+								//alert(polyLines.length);								
+							}			
+						}
+					});
+					j++;					
+			}
+			j = 0;		
+			//Empty myCluster & reset veloc.
+			//veloc = 0;
+			//myCluster.splice(0,myCluster.length);
+		}
 	}
 	
 </script>
