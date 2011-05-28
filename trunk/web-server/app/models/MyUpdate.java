@@ -12,11 +12,11 @@ import java.util.Date;
 public class MyUpdate
 {
     long device_id;
-    float speed;
+    double speed;
     double longitude,latitude;
     long date;
     
-    public MyUpdate(long device_id, float speed, double longitude, double latitude, Date date)
+    public MyUpdate(long device_id, double speed, double longitude, double latitude, Date date)
     {
 	this.device_id=device_id;
 	this.speed=speed;

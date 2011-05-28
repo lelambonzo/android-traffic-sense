@@ -22,13 +22,13 @@ public class Update extends Model
     public double longitude;
     public double latitude;
     public double altitude;
-    public float bearing;
-    public float accuracy;
-    public float speed;
+    public double bearing;
+    public double accuracy;
+    public double speed;
     public Date date;
 
     public Update(Client client, double longitude, double latitude,
-	    double altitude, float bearing, float accuracy, float speed,
+	    double altitude, double bearing, double accuracy, double speed,
 	    long date)
     {
 	this.client = client;
