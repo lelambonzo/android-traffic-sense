@@ -188,7 +188,7 @@ public class Statistics extends CRUD
 	List<Update> updates = Update
 		.find("date >= ? AND date <= ? AND speed >= ? AND speed <= ? AND client.device_id != ? ORDER BY date DESC",
 			new Date(date - 10000), new Date(date + 10000),
-			speed - 2.77777778f, speed + 2.77777778f, c.device_id)
+			speed - 2.77777778, speed + 2.77777778, c.device_id)
 		.fetch();
 	if (updates.isEmpty())
 	    return false;
